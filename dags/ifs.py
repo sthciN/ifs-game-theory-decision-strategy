@@ -63,7 +63,7 @@ def get_ifs_dts():
             conn_id=connection_id,
             metadata=Metadata(schema=bigquery_dataset_id)
         ),
-        use_native_support=False,
+        if_exists="replace",
     )
     # [END operator_gcs_to_bigquery]
 
