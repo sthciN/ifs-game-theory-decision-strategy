@@ -10,7 +10,10 @@ from airflow.decorators import dag, task
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryUpdateTableSchemaOperator
-
+from include.dbt.cosmos_config import DBT_PROJECT_CONFIG, DBT_CONFIG
+from cosmos.airflow.task_group import DbtTaskGroup
+from cosmos.constants import LoadMode
+from cosmos.config import ProjectConfig, RenderConfig
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -31,7 +34,7 @@ bigquery_table_name = os.getenv("BIGQUERY_TABLE_NAME")
     catchup=False,
     tags=["ifs"],
 )
-def get_ifs_dts():
+def ifs_dag():
     # [START operator_local_to_gcs]
     local_csv_to_gcs = LocalFilesystemToGCSOperator(
         task_id="local_csv_to_gcs",
@@ -90,7 +93,16 @@ def get_ifs_dts():
         return check(scan_name)
     # [END raw_data_check]
 
+    transform = DbtTaskGroup(
+        group_id='transform',
+        project_config=DBT_PROJECT_CONFIG,
+        profile_config=DBT_CONFIG,
+        render_config=RenderConfig(
+            load_method=LoadMode.DBT_LS,
+            select=['path:models/transform']
+        )
+    )
     raw_data_check = raw_data_check()
-    (local_csv_to_gcs >> create_dataset >> gcs_to_bq >> schema_field_update >> raw_data_check)
+    (local_csv_to_gcs >> create_dataset >> gcs_to_bq >> schema_field_update >> raw_data_check >> transform)
 
-get_ifs_dts()
+ifs_dag()

@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: ifs
+    database: project-stats-fin
+
+    tables:
+      - name: ifs_table
