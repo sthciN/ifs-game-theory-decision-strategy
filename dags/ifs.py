@@ -87,10 +87,12 @@ def ifs_dag():
 
     # [START raw_data_check]
     @task
-    def raw_data_check(scan_name='raw_data_check'):
-        from include.soda.check_raw_data import check
+    def raw_data_check(scan_name='raw_data_check', check_path='raw'):
+        from include.soda.checks import check
 
-        return check(scan_name)
+        return check(scan_name, checks_subpath=check_path)
+    
+    raw_data_check = raw_data_check()
     # [END raw_data_check]
 
     transform = DbtTaskGroup(
@@ -102,7 +104,17 @@ def ifs_dag():
             select=['path:models/transform']
         )
     )
-    raw_data_check = raw_data_check()
-    (local_csv_to_gcs >> create_dataset >> gcs_to_bq >> schema_field_update >> raw_data_check >> transform)
+
+    # [START transform_data_check]
+    @task
+    def transform_data_check(scan_name='transform_data_check', check_path='transform'):
+        from include.soda.checks import check
+
+        return check(scan_name, checks_subpath=check_path)
+    
+    transform_data_check = transform_data_check()
+    # [END transform_data_check]
+
+    (local_csv_to_gcs >> create_dataset >> gcs_to_bq >> schema_field_update >> raw_data_check >> transform >> transform_data_check)
 
 ifs_dag()

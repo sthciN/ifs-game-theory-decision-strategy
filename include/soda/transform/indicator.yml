@@ -7,8 +7,6 @@ checks for indicator:
           country_name: string
           indicator_name: string
   - missing_count(indicator_name) = 0:
-      name: one row per indicator
       missing values: ['']
   - missing_count(country_name) = 0:
-      name: one row per country
       missing values: ['']
