@@ -1,0 +1,20 @@
+checks for ifs_table:
+  - schema:
+      fail:
+        when required column missing: [
+          "_Country_Name_",
+          "Country_Code",
+          "Indicator_Name",
+          "Indicator_Code",
+          "Time_Period",
+          "Value",
+          "Status"
+          ]
+        when wrong column type:
+          _Country_Name_: string
+          Country_Code: integer
+          Indicator_Name: string
+          Indicator_Code: string
+          Time_Period: INTEGER
+          Value: float64
+          Status: string

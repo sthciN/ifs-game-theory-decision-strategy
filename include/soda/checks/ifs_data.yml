@@ -1,0 +1,5 @@
+checks for ifs_table:
+  - missing_count(Indicator_Name) = 0
+  - missing_count(_Country_Name_) = 0
+  - min(Time_Period) >= 2019
+  - max(Time_Period) <= 2025

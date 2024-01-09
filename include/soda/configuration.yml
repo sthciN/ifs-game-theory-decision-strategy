@@ -1,4 +1,4 @@
-data_source your_data_source_name:
+data_source ifs_table:
   type: bigquery
   connection:
     account_info_json_path: include/gcp/service_account.json
@@ -6,9 +6,9 @@ data_source your_data_source_name:
     - https://www.googleapis.com/auth/bigquery
     - https://www.googleapis.com/auth/cloud-platform
     - https://www.googleapis.com/auth/drive
-    project_id: your_project_id
-    dataset: your_dataset_name
+    project_id: "project-stats-fin"
+    dataset: ifs
 soda_cloud:
   host: cloud.soda.io
-  api_key_id: soda_api_key_id
-  api_key_secret: soda_key_secret
+  api_key_id: fb5e48b3-4c68-4b14-8b3f-98d1b0744596
+  api_key_secret: JoxRWdqpPG6nktlMIJ2Gk7iuDMqalQoDwQswu9wiDdhjRHKK0qCr7A
