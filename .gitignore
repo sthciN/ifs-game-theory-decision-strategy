@@ -158,8 +158,23 @@ cython_debug/
 #  and can be added to the global gitignore or merged into this file.  For a more nuclear
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
-
+ifs.ipynb
 .DS_Store
 service_account.json
 include/dataset/
 /lab
+include/dbt_packages/
+include/dbt_modules/
+include/dbt/logs/
+include/dbt/target/
+include/dbt/.env
+include/dbt/.env.example
+include/dbt/.envrc
+include/dbt/.secrets/
+include/dbt/.user.yml
+include/dbt/package-lock.yml
+include/dbt/dbt_packages/
+
+.astro/
+airflow_settings.yaml
+packages.txt
