@@ -13,7 +13,7 @@ from airflow.providers.google.cloud.operators.bigquery import BigQueryUpdateTabl
 from include.dbt.cosmos_config import DBT_PROJECT_CONFIG, DBT_CONFIG
 from cosmos.airflow.task_group import DbtTaskGroup
 from cosmos.constants import LoadMode
-from cosmos.config import ProjectConfig, RenderConfig
+from cosmos.config import RenderConfig
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
