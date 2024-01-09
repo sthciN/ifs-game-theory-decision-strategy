@@ -1,0 +1,7 @@
+name: 'ifs'
+
+profile: 'ifs'
+
+models:
+  retail:
+    materialized: table
