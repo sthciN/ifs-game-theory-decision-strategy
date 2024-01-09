@@ -1,0 +1,9 @@
+check for indicator_type:
+  - schema:
+      fail:
+        when required column missing: 
+          [indicator_name]
+        when wrong column type:
+          indicator_name: string
+  - duplicate_count(indicator_name) = 0
+    name: one row per indicator
