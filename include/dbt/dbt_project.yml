@@ -3,5 +3,9 @@ name: 'ifs'
 profile: 'ifs'
 
 models:
-  retail:
+  country:
+    materialized: table
+  indicator:
+    materialized: table
+  indicator_type:
     materialized: table
