@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+import pandas as pd
 
 from dotenv import find_dotenv, load_dotenv
 from astro import sql as aql
@@ -10,10 +11,14 @@ from airflow.decorators import dag, task
 from airflow.providers.google.cloud.transfers.local_to_gcs import LocalFilesystemToGCSOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateEmptyDatasetOperator
 from airflow.providers.google.cloud.operators.bigquery import BigQueryUpdateTableSchemaOperator
-from include.dbt.cosmos_config import DBT_PROJECT_CONFIG, DBT_CONFIG
+from airflow.providers.google.cloud.operators.bigquery import BigQueryGetDataOperator
+from airflow.operators.python import PythonOperator
 from cosmos.airflow.task_group import DbtTaskGroup
 from cosmos.constants import LoadMode
 from cosmos.config import RenderConfig
+from include.dbt.cosmos_config import DBT_PROJECT_CONFIG, DBT_CONFIG
+from utils.helpers import BigqieryData
+
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -86,7 +91,7 @@ def ifs_dag():
     # [END schema_field_update]
 
     # [START raw_data_check]
-    @task
+    @task.external_python(python="/usr/local/airflow/soda_venv/bin/python")
     def raw_data_check(scan_name='raw_data_check', check_path='raw'):
         from include.soda.checks import check
 
@@ -106,7 +111,7 @@ def ifs_dag():
     )
 
     # [START transform_data_check]
-    @task
+    @task.external_python(python="/usr/local/airflow/soda_venv/bin/python")
     def transform_data_check(scan_name='transform_data_check', check_path='transform'):
         from include.soda.checks import check
 
@@ -115,6 +120,33 @@ def ifs_dag():
     transform_data_check = transform_data_check()
     # [END transform_data_check]
 
-    (local_csv_to_gcs >> create_dataset >> gcs_to_bq >> schema_field_update >> raw_data_check >> transform >> transform_data_check)
+
+    @task
+    def country_indicator_into_xcom(ti):
+        ti.xcom_push(key='connection_id', value=connection_id)
+        BigqieryData(connection_id=connection_id,
+                        ti=ti,
+                        bigquery_dataset_id=bigquery_dataset_id,
+                        bigquery_table_name="indicator",
+                        ).get_tabledata(xcom_key='indicators_data')
+        return True
+    
+    @task
+    def get_country_data(ti): 
+        BigqieryData(connection_id=connection_id,
+                        ti=ti,
+                        bigquery_dataset_id=bigquery_dataset_id,
+                        bigquery_table_name="country",
+                        ).get_tabledata(xcom_key='countries_data')
+
+
+    ([local_csv_to_gcs, create_dataset] >> 
+     gcs_to_bq >> 
+     schema_field_update >> 
+     raw_data_check >> 
+     transform >> 
+     transform_data_check >>
+     [country_indicator_into_xcom(), get_country_data()]
+    )
 
 ifs_dag()
