@@ -9,3 +9,5 @@ models:
     materialized: table
   indicator_type:
     materialized: table
+  country_strategy:
+    materialized: table
