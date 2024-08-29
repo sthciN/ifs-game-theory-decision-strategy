@@ -178,3 +178,5 @@ include/dbt/dbt_packages/
 .astro/
 airflow_settings.yaml
 packages.txt
+
+logs/
